@@ -8,6 +8,52 @@ A time series is a realization of a sucession of observations of a random variab
 
 In particular, if the observations of a time series are taken on the moments $\tau_1, \tau_2, ..., \tau_n$ then the stochastic process will be denoted by ${Z(\tau_1), Z(\tau_2), ..., Z(\tau_n)}$ while the time series will be denoted by $\{Z_t : t\in T\}$ or just $\{Z_t\}$. Thus, when having $n$ succesive values of a time series, we will write $z_1, z_2,...,z_{n-1}, z_n$ in order to denote the observations taken in equidistant intervals $\tau_0 + h, \tau_0 + 2h, ..., \tau_0 + (n-1)h, \tau_0 + nh$ where $\tau_0$ is some point in time that works as origin and $h$ is the constant longitude of the interval of time that separates two adjacent observations. 
 
+
+
+### Stationarity
+Understanding and ensuring stationarity is crucial for accurate modeling, forecasting, and analysis in time series studies. In must of the cases, in order for a time series to be modeled, it must satisfy at least weak stationarity condition. Let $\{Z_t\}$ be a time series. 
+  
+**Weak Sattionarity**
+$\{Z_t\}$ is said to be stationary of second order or weakly sationaty if the mean, variance and the covariance of the process do not depend on time. This is:
+* $E[Z_t] = \mu$ for some constant $\mu\in\mathbb{R}$ that do not depends on $t$.
+* $Var[Z_t] = \sigma^2$ for some constant $\sigma^2\in\mathbb{R}^{+}$ that do not depends on $t$
+* $Cov(Z_t, Z_{t+k}) = \gamma(k)$ where $\gamma(k)$ is a function of tha lag $k$ -callend the autovariance function- that do not depends on $t$.
+  
+Thus, neither the level of the series nor its variability depend on time. Regarding covariance, there is no dependence on time, but there is dependence on the lags between the variables. This leads to the idea that the series will exhibit the same general behavior regardless of when it is observed. That is, if a certain number of contiguous observations of a series were plotted, the resulting graph would be quite similar to that obtained by plotting the same number of contiguous observations, but $k$ periods forward or backward from the initially considered observations.
+  
+**Strong  Stationarity**
+$\{Z_t\}$ is said to be strictly or strongly stationay if the joint probability distribution of any set of observations is the same regardless of when they are observed. this is:
+$$ f(Z_t, Z_{t+1}, \dots, Z_{t+m}) = f(Z_{t+k}, Z_{t+k+1}, \dots, Z_{t+k+m}) \quad \forall k, m \in \mathbb{N} $$
+  
+**Strong stationarity vs. weak stationarity**
+While strict stationarity requires that all aspects of the joint distribution remain unchanged over time, weak stationarity only requires the mean, variance, and autocovariance to be time-invariant, making it more applicable in practical scenarios. Note that strong stationariry implies weak sationarity. 
+  
+**Making a Series Stationary**  
+If a time series is non-stationary, it can often be transformed into a stationary series through:
+* Differencing: Subtracting previous observations from current observations to stabilize variance. 
+* Transformation: Applying mathematical transformations (e.g., logarithms or Box-Cox) to stabilize variance.
+* Detrending: Removing trends or seasonality through various methods.
+  
+**ADF Test**
+Stationarity can be tested throug the Augmeted Dickey-Fuller Test (ADF Test). The ADF test has the following hypotheses:
+* Null Hypothesis (H0): The time series has a unit root, meaning it is non-stationary.
+* Alternative Hypothesis (H1): The time series does not have a unit root, meaning it is stationary.
+  
+You can do this through the followng code:  
+`# Exectute Dickey-Fuller test for stationarity`  
+`from statsmodels.tsa.stattools import adfuller`  
+`ts = df['y']`  
+`result = adfuller(ts)`  
+`print('ADF Statistic:', result[0])`  
+`print('p-value:', result[1])`  
+`print('Critical Values:')`  
+`for key, value in result[4].items():`  
+`    print('\t%s: %.3f' % (key, value))`  
+  
+Reject the null hypothesis for suffiently small values of the $p$-value, for example $p<0.05$. This would mean that there is enough evidence suggest that the time series is stationary. If the $p$-value is not sufficiently small, for example, $p>0.5$, then there would not be enough evidence in order to suggest the time series is stationary. 
+
+
+
 ### Seasonality
 Seasonality refers to periodic fluctuations in various aspects of a business, economy, or environment that occur at regular intervals within a year. These patterns are typically driven by factors like weather, holidays, or cultural events. For instance:  
   
@@ -25,49 +71,56 @@ We'll speak generally of a seasonal period that includes $E$ contiguous observat
 * $E = 4$ for qurterly seasonality.
 And son on. 
 
-### Stationarity
-Understanding and ensuring stationarity is crucial for accurate modeling, forecasting, and analysis in time series studies. In must of the cases, in order for a time series to be modeled, it must satisfy at least weak stationarity condition. Let $\{Z_t\}$ be a time series. 
+### Exogenous Variables in Time Series Definition 
+While endogenous variables are the main time series data in the model, exogenous variables may be included as additional inputs that might affect the endogenous variable in order to excel the power of the models edxplanatioin or prediction capabilities. 
   
-Weak Sattionarity  
-$\{Z_t\}$ is said to be stationary of second order or weakly sationaty if the mean, variance and the covariance of the process do not depend on time. This is:
-* $E[Z_t] = \mu$ for some constant $\mu\in\mathbb{R}$ that do not depends on $t$.
-* $Var[Z_t] = \sigma^2$ for some constant $\sigma^2\in\mathbb{R}^{+}$ that do not depends on $t$
-* $Cov(Z_t, Z_{t+k}) = \gamma(k)$ where $\gamma(k)$ is a function of tha lag $k$ -callend the autovariance function- that do not depends on $t$.
-  
-Thus, neither the level of the series nor its variability depend on time. Regarding covariance, there is no dependence on time, but there is dependence on the lags between the variables. This leads to the idea that the series will exhibit the same general behavior regardless of when it is observed. That is, if a certain number of contiguous observations of a series were plotted, the resulting graph would be quite similar to that obtained by plotting the same number of contiguous observations, but $k$ periods forward or backward from the initially considered observations.
-  
-Strong  Stationarity  
-$\{Z_t\}$ is said to be strictly or strongly stationay if the joint probability distribution of any set of observations is the same regardless of when they are observed. this is:
-$$ f(Z_t, Z_{t+1}, \dots, Z_{t+m}) = f(Z_{t+k}, Z_{t+k+1}, \dots, Z_{t+k+m}) \quad \forall k, m \in \mathbb{N} $$
+Nevertheless, exogenous variables not always help to buid a better model; thus, The relevance of these must be evaluated. It's possible to evaluate this before and after trainig. 
+* Exogenous variables relevance check before training:
+    * ???
+    * ???
+* Exogenous variables relevance check after ttrainig: 
+    * ???  
+    * ???
 
-Note that strong stationariry implies weak sationarity. 
-  
-Strong stationarity vs. weak stationarity  
-While strict stationarity requires that all aspects of the joint distribution remain unchanged over time, weak stationarity only requires the mean, variance, and autocovariance to be time-invariant, making it more applicable in practical scenarios.
-  
-Making a Series Stationary  
-If a time series is non-stationary, it can often be transformed into a stationary series through:
-* Differencing: Subtracting previous observations from current observations to stabilize variance. 
-* Transformation: Applying mathematical transformations (e.g., logarithms or Box-Cox) to stabilize variance.
-* Detrending: Removing trends or seasonality through various methods.
-  
-ADF Test  
-Stationarity can be tested throug the Augmeted Dickey-Fuller Test (ADF Test). The ADF test has the following hypotheses:
-* Null Hypothesis (H0): The time series has a unit root, meaning it is non-stationary.
-* Alternative Hypothesis (H1): The time series does not have a unit root, meaning it is stationary.
-  
-You can do this through the followng code:  
-`# Exectute Dickey-Fuller test for stationarity`  
-`from statsmodels.tsa.stattools import adfuller`  
-`ts = df['y']`  
-`result = adfuller(ts)`  
-`print('ADF Statistic:', result[0])`  
-`print('p-value:', result[1])`  
-`print('Critical Values:')`  
-`for key, value in result[4].items():`  
-`    print('\t%s: %.3f' % (key, value))`  
-  
-Reject the null hypothesis for suffiently small values of the $p$-value, for example $p<0.05$. This would mean that there is enough evidence suggest that the time series is stationary. If the $p$-value is not sufficiently small, for example, $p>0.5$, then there would not be enough evidence in order to suggest the time series is stationary. 
+Exogenous variables must be adjusted to the usecase in hands. Nevertheless, some examples of exogenous variables may include the following:
+ * Macroeconomical variables
+    * Interest Rates
+    * Inflation Rates
+    * Central Bank Reserves
+    * GDP
+    * Unemployment Rates
+    * Exchange Rates
+    * Consumer Confidence Index
+    * Income Levels
+    * Population Growth
+    * Urbanization Trends
+* Financial and Business Metrics
+    * Stock Prices
+    * Corporate Earnings
+    * Operational Costs
+* Market-Specific Factors
+    * Price of Product
+    * Product Availability
+    * Competitor Pricing and Availability
+    * Product Market Share
+    * Marketing and Promotions
+    * Consumer Trends and Preferences
+    * Supply Chain Metrics
+    * Supply and Demand Metrics
+* External Events
+    * Regulatory Changes
+    * Geopolitical Events
+    * Natural Disasters
+* Commodity Prices
+    * Energy Commodities
+    * Metal Commodities
+    * Agricultural Commodities
+    * Livestock and Animal Products
+    * Soft Commodities
+
+There is a consideration to taker into account when using exogenous variables for modeling time series. Let $\{Z_t\}$ be a time series with seasonal period $E$ that describes a fenomenom that might be influenced by the variables $\{X_1\}$, $\{X_2\}$, ..., $\{X_n\}$. Supose you've got $N$ data points for the  endogenous variable $Z_t$ and your forecast horizon is $K$ periods forward. Thus, in order to make such forecast, the exogenous variables $X_1,X_2,...,X_n$ must have $N+K$ data points. Therefore, the exogenous variables must be proyected $K$ periods forward. 
+
+It's important no note that is higly suggested to normalize the exogenous variables before taking any action with them. 
 
 
 
@@ -98,9 +151,11 @@ Let be the following:
 * $\{Z_t\}$ time series. 
 * $\{a_t\}$ white noise process. 
 * $\mu\in\mathbb{R}$ the mean of the time series. 
+* * $\phi_1, \phi_2, ..., \phi_p \in\mathbb{R}$.
+* $\Phi_1, \Phi_2, ..., \phi_p \in\mathbb{R}$.
+* $I\in\mathbb{N}\cup{0\}$
 * $\theta_1, \theta_2, ..., \theta_q \in\mathbb{R}$.
-* $\phi_1, \phi_2, ..., \phi_p \in\mathbb{R}$.
-
+* $\Theta_1, \Theta_2, ..., \Theta_q \in\mathbb{R}$.
 
 
 ### Operators
@@ -120,7 +175,6 @@ Let $\{Z_t\}$ be a time series. The backshift operator $B$ is such that $BZ_t = 
 **Seasonal Backshift Operator**  
 Let $\{Z_t\}$ be a time series with seasonal period $E$. The seasonal backshift operator $B^{kE}$ $(k\in\mathbb{N})$ is such that:
 $$B^{kE}Z_t = Z_{t-kE}$$
-
 
 **Difference Operator**  
 Let $\{Z_t\}$ be a time series. The differencing operator $\nabla$ is such that $\nabla Z_t = Z_{t} - Z_{t-1}$ $\forall t \in T$. Moreover, for $t\in T$, we have that:
@@ -154,12 +208,7 @@ Note that the a backshift polinomial $G(B)$ could have an infinite number of coe
 
 
   
-
-
-
-
-
-### ARIMA Models
+### AR, MA ARMA and ARIMA Models
 
 **$AR(p)$**  
 **Autoregressive Model with the last $p$ autoregressors**  
@@ -209,7 +258,9 @@ Where $\psi(B) = 1 - \psi_1B - \psi_2B^2 - ...$ is a las polinomial that turns t
 * For ARMA and ARIMA models, $\psi(B) = \frac{\theta(B)}{\psi(B)}$
 * Same for ARMA as for ARIMA models, but considering the $d$ diffrences.
 
-#### Stationarity and Inveribility for ARIMA models
+#### Assumptions in ARIMA Models
+
+**Stationarity and Inveribility**
 Consider a time series $\{Z_t\}$. In order for a AR model to be used, it must be sationary. In order for a MA model to be used, it must be invertible. In order fot an AMRA model to be used, it must be stationary and invertible. 
 
 * An AR model will be **stationary** if the the roots of the backshift polynomial $\phi(B) = 1 - \phi_1B - \phi_2B^2 - .... - \phi_pB^p$ lie outside the unit circle in the complex plane.
@@ -223,7 +274,7 @@ Note that the model has to be estimated in order to ensure its stationarity and 
 
 
 
-### SARIMA
+### SARIMA Models
 **$SARIMA(P,D,Q)_E$**  
 **Purely Seasonal Autoregressive Integrated Moving Averges Model**  
 Let \{Z_t\} be a time series with seasonal period $E$. An purely seasonal autorregresive integrated moving averages model is expressed as follows:
@@ -252,14 +303,46 @@ The greatness of the multiplicative seasonal autorregresive integrated moving av
 
 In very few cases will the series under study be purely seasonal; instead, it will typically exhibit both seasonal and non-seasonal effects. That is why, in practice, we use the multiplicative seasonal autorregresive integrated moving averages model. We'll call it just SARIMA model from now on. 
 
-### Stationarity and Invertibility for SARIMA models
+#### Assumptions in SARIMA Models
 
 
 
 
 
 
-## SARIMAX model
+### SARIMAX model
+**SARIMAX(p,d,q)(P,D,Q)_E**   
+**Seasonal Autoregressive Integrated Moving Averages Model with eXogenous Variables**  
+Let $\{Z_t\}$ be a time series with seasonal period $E$ that describes a fenomenom that might be influenced by the variables $\{X_1\}$, $\{X_2\}$, ..., $\{X_n\}$. A seaosnal autorgegressive inegrated moving averages model with exogenoius variables is expresed as follows:
+$$\phi(B)\Phi(B^{E})\nabla^d\nabla^D_E(Z_t) = \theta(B)\Theta(B^{E})a_t + \sum_{i = 1}^{n} X_i$$
+Where:
+* $\phi(B) = 1-\phi_1B - \phi_2B^{2} - ...- \phi_qB^{q}$ is a backshift polynomial of order $q$ that represents the  autoregressive part of the model. Thus, the current value of a time series is regressed on its own $q$ previous values. This is, $Z_{t}, Z_{t-1}, ..., Z_{t-q}$.
+* $\theta(B) = 1-\theta_1B - \theta_2B^{2} - ...- \theta_pB^{p}$ is a backshift polynomial of order $p$ that represents the moving averages part of the  model. Thus, the current value of a time series can be expressed as a linear combination of $q$ past error terms. This is, the terms $a_{t}, a_{t-2}, ..., a_{t-p}$.
+* $\Phi(B^E) = 1-\Phi_1B^E - \Phi_2B^{2E} - ...- \Phi_QB^{QE}$ is a seasonal backshift polynomial of order $Q$ that represents the seasonal autoregressive part of the model. Thus, the current value of a time series is regressed on its own $Q$ previous seasonal values. This is, $Z_{t-E}, Z_{t-2E}, ..., Z_{t-QE}$.
+* $\Theta(B^E) = 1-\Theta_1B^E - \Theta_2B^{2E} - ...- \Theta_PB^{PE}$ is a seasonal backshift polynomial of order $P$ that represents the seasonal moving averages part of the  model. Thus, the current value of a time series can be expressed as a linear combination of $Q$ past seaosnal error terms. This is, the terms $a_{t-E}, a_{t-2E}, ..., a_{t-PE}$.
+* $\nabla_{E}^{D}$ is an seaosnal difference operator of order $D$.
+* $a_t$ is a white noise porcess.
+
+The main process $\{Z_t\}$ is referred as de endogenous variable while the processes $X_1, X_2,...,X_n$ are referred as exogenous variables or covariates. The idea behind the SARIMAX model is that these last variables may improve the performance of the model.
+
+
+#### Assumptions in SARIMAX Models
+
+
+
+
+### VARMAX Models
+
+
+#### Assumptions in VARMAX Models
+
+
+
+
+
+
+
+
 
 
 
